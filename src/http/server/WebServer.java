@@ -10,6 +10,7 @@ import java.io.ByteArrayInputStream;
 import java.io.ByteArrayOutputStream;
 import java.io.File;
 import java.io.FileInputStream;
+import java.io.FileOutputStream;
 import java.io.FileReader;
 import java.io.IOException;
 import java.io.InputStreamReader;
@@ -61,7 +62,8 @@ public class WebServer {
 				System.out.println("Connection, sending data.");
 				BufferedReader in = new BufferedReader(new InputStreamReader(remote.getInputStream()));
 				PrintWriter out = new PrintWriter(remote.getOutputStream());
-				BufferedOutputStream outPutStream = new BufferedOutputStream(remote.getOutputStream());
+				BufferedOutputStream outputStream = new BufferedOutputStream(remote.getOutputStream());
+				BufferedInputStream inputStream = new BufferedInputStream(remote.getInputStream());
 
 				// read the data sent. We basically ignore it,
 				// stop reading once a blank line is hit. This
@@ -81,21 +83,21 @@ public class WebServer {
 					ressource = ressource.replace("GET /", "");
 					ressource = ressource.replace(" HTTP/1.1", "");
 					System.out.println(request);
-					requestGET(ressource, out, outPutStream);
+					requestGET(ressource, out, outputStream);
 					request = "";
 					remote.close();
 				} else if (request.startsWith("PUT")) {
 					ressource = ressource.replace("PUT /", "");
 					ressource = ressource.replace(" HTTP/1.1", "");
 					System.out.println(request);
-					requestPUT(ressource, out, outPutStream);
+					requestPUT(ressource, out, outputStream, inputStream);
 					request = "";
 					remote.close();
 				} else if (request.startsWith("POST")) {
 					ressource = ressource.replace("POST /", "");
 					ressource = ressource.replace(" HTTP/1.1", "");
 					System.out.println(request);
-					requestPOST(ressource, out, outPutStream);
+					requestPOST(ressource, out, outputStream);
 					request = "";
 					remote.close();
 				} else if (request.startsWith("HEAD")) {
@@ -110,7 +112,7 @@ public class WebServer {
 					ressource = ressource.replace("DELETE /", "");
 					ressource = ressource.replace(" HTTP/1.1", "");
 					System.out.println(request);
-					requestDELETE(ressource, out, outPutStream);
+					requestDELETE(ressource, out, outputStream);
 					request = "";
 					remote.close();
 				}
@@ -126,7 +128,7 @@ public class WebServer {
 		String contentType = null;
 
 		if (extension.equals(".html") || extension.equals(".htm"))
-			contentType = "Content-Type: text/html";
+			contentType = "text/html";
 
 		// else if (extension.equals(".png"))
 		// out.println("Content-Type: image/png");
@@ -234,74 +236,61 @@ public class WebServer {
 		}
 	}
 
-	public void requestPOST(String ressource, PrintWriter out, BufferedOutputStream outPutStream) {
 
-		String filePath = "\\lib"
-				+ ressource;
-		File file = new File(filePath);
-		int fileLength = (int) file.length();
-		String extension = "";
-		if (ressource.contains(".")) {
-			extension = ressource.substring(ressource.indexOf("."));
-		}
+	public void requestPOST(String ressource, PrintWriter out, BufferedOutputStream outPutStream, BufferedInputStream inputStream) {
+		
+		try {
 
-		if (ressource.equals("")) {
-			// send the headers
-			out.println("HTTP/1.0 200 OK");
-			out.println("Content-Type: text/html");
-			out.println("Server: Bot");
-			// this blank line signals the end of the headers
-			out.println("");
-			// Send the HTML page
-			out.println("<H1>Welcome to the Ultra Mini-WebServer</H1>");
-			out.flush();
+			File file = new File("\\lib\\" + ressource);
+			Boolean exists = file.exists();
+			Boolean isFile = file.isFile();
+			BufferedOutputStream fileOutput = new BufferedOutputStream(new FileOutputStream(file, file.exists()));
+			int fileLength = (int) file.length();
+			byte[] buffer = new byte[fileLength];
 
-		} else if (file.exists() && file.isFile()) {
-			// send the headers
-
-			out.println("HTTP/1.0 200 OK");
-			out.println("Content-Type :" + getContentType(extension));
-			out.println("Server: Bot");
-			out.println("Content-Length: " + fileLength);
-			out.println("");
-			out.flush();
-			try {
-
-				// Content
-				byte[] buffer = new byte[fileLength];
-				FileInputStream fileInputStream = null;
-				try {
-					fileInputStream = new FileInputStream(file);
-					fileInputStream.read(buffer);
-				} finally {
-					if (fileInputStream != null)
-						fileInputStream.close();
-				}
-				outPutStream.write(buffer, 0, fileLength);
-
-				outPutStream.flush();
-			} catch (Exception e) {
-
+			while (inputStream.available() > 0) {
+				int nbRead = inputStream.read(buffer);
+				fileOutput.write(buffer, 0, nbRead);
 			}
+			fileOutput.flush();
+			fileOutput.close();
+			if(exists && isFile) {
+				out.println("HTTP/1.0 200 OK");
+				out.println("Content-Type: text/html");
+				out.println("Server: Bot");
+				// this blank line signals the end of the headers
+				out.println("");
+				// Send the HTML page
+				out.println("<H1>Post R�ussi </H1>");
+				out.flush();
+			}else {
+				out.println("HTTP/1.0 201 Created");
+				out.println("Content-Type: text/html");
+				out.println("Server: Bot");
+				// this blank line signals the end of the headers
+				out.println("");
+				// Send the HTML page
+				out.println("<H1>Post R�ussi </H1>");
+				out.flush();
+			}
+			
 
-		} else {
-			// send the headers
-			out.println("HTTP/1.0 404 Not Found");
+		} catch (Exception e) {
+			out.println("HTTP/1.0 500 Internal Server Error");
 			out.println("Content-Type: text/html");
 			out.println("Server: Bot");
 			// this blank line signals the end of the headers
 			out.println("");
 			// Send the HTML page
-			out.println("<H1>ERREUR 404 NOT FOUND </H1>");
-			out.println("<H2>Fichier introuvable </H2>");
+			out.println("<H1>ERREUR 500 Internal Server Error </H1>");
+			out.println("<H2>Erreur interne du Serveur </H2>");
 			out.flush();
-
 		}
 
 	}
 
-	public void requestPUT(String ressource, PrintWriter out, BufferedOutputStream outPutStream) {
-
+	public void requestPUT(String ressource, PrintWriter out, BufferedOutputStream outputStream, BufferedInputStream inputStream) {
+		
 	}
 
 	public void requestHEAD(String ressource, PrintWriter out) {
@@ -355,7 +344,7 @@ public class WebServer {
 		}
 	}
 
-	public void requestDELETE(String ressource, PrintWriter out, BufferedOutputStream outPutStream) {
+	public void requestDELETE(String ressource, PrintWriter out, BufferedOutputStream outputStream) {
 
 	}
 
