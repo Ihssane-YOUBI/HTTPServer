@@ -101,10 +101,11 @@ public class WebServer {
 					request = "";
 					remote.close();
 				} else if (request.startsWith("HEAD")) {
+					System.out.println("HEAD ressource: " + ressource);
 					ressource = ressource.replace("HEAD /", "");
 					ressource = ressource.replace(" HTTP/1.1", "");
-					System.out.println(request);
-					requestHEAD(ressource, out, outputStream);
+					System.out.println("HEAD request: " + request);
+					requestHEAD(ressource, out);
 					request = "";
 					remote.close();
 				} else if (request.startsWith("DELETE")) {
@@ -129,25 +130,25 @@ public class WebServer {
 		if (extension.equals(".html") || extension.equals(".htm"))
 			contentType = "text/html";
 
-		// else if (extension.equals(".png"))
-		// out.println("Content-Type: image/png");
-
-		else if (extension.equals(".jpeg") || extension.equals(".jpg") || extension.equals(".png"))
-			contentType = "Image";
+		else if (extension.equals(".jpeg") || extension.equals(".jpg") || extension.equals(".png") || extension.equals(".gif"))
+			contentType = "image/" + extension.replace(".", "");
 
 		else if (extension.equals(".css"))
 			contentType = "text/css";
 
 		else if (extension.equals(".pdf"))
 			contentType = "application/pdf";
+		
+		else if (extension.equals(".zip"))
+			contentType = "application/zip";
 
 		else if (extension.equals(".odt"))
 			contentType = "application/vnd.oasis.opendocument.text";
 
-		else if (extension.equals(".mp4"))
+		else if (extension.equals(".mp4") || extension.equals(".mov"))
 			contentType = "video/mp4";
-
-		else if (extension.equals(".mp3"))
+		
+		else if (extension.equals(".mp3")|| extension.equals(".m4a"))
 			contentType = "audio";
 
 		return contentType;
@@ -234,6 +235,7 @@ public class WebServer {
 			}
 		}
 	}
+
 
 	public void requestPOST(String ressource, PrintWriter out, BufferedOutputStream outPutStream, BufferedInputStream inputStream) {
 		
@@ -354,8 +356,55 @@ public class WebServer {
 		}
 	}
 
-	public void requestHEAD(String ressource, PrintWriter out, BufferedOutputStream outputStream) {
+	public void requestHEAD(String ressource, PrintWriter out) {
 
+		try {
+			String filePath = "C:\\Users\\drape\\Documents\\4IF\\Programmation r�seaux\\Prog_reseaux_HTTP\\TP-HTTP-Code\\lib\\"
+					+ ressource;
+			File file = new File(filePath);
+			int fileLength = (int) file.length();
+			String extension = "";
+			if (ressource.contains(".")) {
+				extension = ressource.substring(ressource.indexOf("."));
+			}
+
+			if (ressource.equals("")) {
+				// send the headers
+				out.println("HTTP/1.0 200 OK");
+				out.println("Content-Type: text/html");
+				out.println("Server: Bot");
+				out.println("");
+				out.flush();
+
+			} else if (file.exists() && file.isFile()) {
+				// send the headers
+
+				out.println("HTTP/1.0 200 OK");
+				out.println("Content-Type :" + getContentType(extension));
+				out.println("Server: Bot");
+				out.println("Content-Length: " + fileLength);
+				out.println("");
+				out.flush();
+				
+			} else {
+				// send the headers
+				out.println("HTTP/1.0 404 Not Found");
+				out.println("Content-Type: text/html");
+				out.println("Server: Bot");
+				out.println("");
+				out.flush();
+			}
+		} catch (Exception e) {
+			try {
+				out.println("HTTP/1.0 500 Internal Server Error");
+				out.println("Content-Type: text/html");
+				out.println("Server: Bot");
+				out.println("");
+				out.flush();
+			} catch (Exception ex) {
+
+			}
+		}
 	}
 
 	public void requestDELETE(String ressource, PrintWriter out, BufferedOutputStream outputStream) {
