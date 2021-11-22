@@ -11,6 +11,7 @@ import java.io.ByteArrayOutputStream;
 import java.io.File;
 import java.io.FileInputStream;
 import java.io.FileReader;
+import java.io.IOException;
 import java.io.InputStreamReader;
 import java.io.OutputStream;
 import java.io.PrintWriter;
@@ -72,34 +73,41 @@ public class WebServer {
 				while (str != null && !str.equals("")) {
 					str = in.readLine();
 					request = request + str + "\n";
-					if (str.contains("GET")) {
-						ressource = str.replace("GET /", "");
-						ressource = ressource.replace(" HTTP/1.1", "");
+					if (str.startsWith("GET") || str.startsWith("PUT") || str.startsWith("POST") || str.startsWith("HEAD")|| str.startsWith("DELETE")) {
+						ressource = str;
 					}
 				}
-				if (request.contains("GET")) {
+				if (request.startsWith("GET")) {
+					ressource = ressource.replace("GET /", "");
+					ressource = ressource.replace(" HTTP/1.1", "");
 					System.out.println(request);
 					requestGET(ressource, out, outPutStream);
 					request = "";
 					remote.close();
-				}else if (request.contains("PUT")) {
+				} else if (request.startsWith("PUT")) {
+					ressource = ressource.replace("PUT /", "");
+					ressource = ressource.replace(" HTTP/1.1", "");
 					System.out.println(request);
 					requestPUT(ressource, out, outPutStream);
 					request = "";
 					remote.close();
-				}
-				else if (request.contains("POST")) {
+				} else if (request.startsWith("POST")) {
+					ressource = ressource.replace("POST /", "");
+					ressource = ressource.replace(" HTTP/1.1", "");
 					System.out.println(request);
 					requestPOST(ressource, out, outPutStream);
 					request = "";
 					remote.close();
-				}
-				else if (request.contains("HEAD")) {
+				} else if (request.startsWith("HEAD")) {
+					ressource = ressource.replace("HEAD /", "");
+					ressource = ressource.replace(" HTTP/1.1", "");
 					System.out.println(request);
 					requestHEAD(ressource, out, outPutStream);
 					request = "";
 					remote.close();
-				}else if (request.contains("DELETE")) {
+				} else if (request.startsWith("DELETE")) {
+					ressource = ressource.replace("DELETE /", "");
+					ressource = ressource.replace(" HTTP/1.1", "");
 					System.out.println(request);
 					requestDELETE(ressource, out, outPutStream);
 					request = "";
@@ -119,8 +127,8 @@ public class WebServer {
 		if (extension.equals(".html") || extension.equals(".htm"))
 			contentType = "Content-Type: text/html";
 
-//		else if (extension.equals(".png"))
-//			out.println("Content-Type: image/png");
+		// else if (extension.equals(".png"))
+		// out.println("Content-Type: image/png");
 
 		else if (extension.equals(".jpeg") || extension.equals(".jpg") || extension.equals(".png"))
 			contentType = "Content-Type: Image";
@@ -146,69 +154,85 @@ public class WebServer {
 
 	public void requestGET(String ressource, PrintWriter out, BufferedOutputStream outPutStream) {
 
-		String filePath = "D:\\Programmation réseaux\\HTTPServer\\lib"
-				+ ressource;
-		File file = new File(filePath);
-		int fileLength = (int) file.length();
-		String extension = "";
-		if (ressource.contains(".")) {
-			extension = ressource.substring(ressource.indexOf("."));
-		}
-
-		if (ressource.equals("")) {
-			// send the headers
-			out.println("HTTP/1.0 200 OK");
-			out.println("Content-Type: text/html");
-			out.println("Server: Bot");
-			// this blank line signals the end of the headers
-			out.println("");
-			// Send the HTML page
-			out.println("<H1>Welcome to the Ultra Mini-WebServer</H1>");
-			out.flush();
-
-		} else if (file.exists() && file.isFile()) {
-			// send the headers
-
-			out.println("HTTP/1.0 200 OK");
-			out.println("Content-Type :" + getContentType(extension));
-			out.println("Server: Bot");
-			out.println("Content-Length: " + fileLength);
-			out.println("");
-			out.flush();
-			try {
-
-				// Content
-				byte[] buffer = new byte[fileLength];
-				FileInputStream fileInputStream = null;
-				try {
-					fileInputStream = new FileInputStream(file);
-					fileInputStream.read(buffer);
-				} finally {
-					if (fileInputStream != null)
-						fileInputStream.close();
-				}
-				outPutStream.write(buffer, 0, fileLength);
-
-				outPutStream.flush();
-			} catch (Exception e) {
-
+		try {
+			String filePath = "C:\\Users\\ihssa\\OneDrive\\Bureau\\4IF\\Programmation Rï¿½seau\\TP-HTTP-Code\\lib\\"
+					+ ressource;
+			File file = new File(filePath);
+			int fileLength = (int) file.length();
+			String extension = "";
+			if (ressource.contains(".")) {
+				extension = ressource.substring(ressource.indexOf("."));
 			}
 
-		} else {
-			// send the headers
-			out.println("HTTP/1.0 404 Not Found");
-			out.println("Content-Type: text/html");
-			out.println("Server: Bot");
-			// this blank line signals the end of the headers
-			out.println("");
-			// Send the HTML page
-			out.println("<H1>ERREUR 404 NOT FOUND </H1>");
-			out.println("<H2>Fichier introuvable </H2>");
-			out.flush();
+			if (ressource.equals("")) {
+				// send the headers
+				out.println("HTTP/1.0 200 OK");
+				out.println("Content-Type: text/html");
+				out.println("Server: Bot");
+				// this blank line signals the end of the headers
+				out.println("");
+				// Send the HTML page
+				out.println("<H1>Welcome to the Ultra Mini-WebServer</H1>");
+				out.flush();
 
+			} else if (file.exists() && file.isFile()) {
+				// send the headers
+
+				out.println("HTTP/1.0 200 OK");
+				out.println("Content-Type :" + getContentType(extension));
+				out.println("Server: Bot");
+				out.println("Content-Length: " + fileLength);
+				out.println("");
+				out.flush();
+				try {
+
+					// Content
+					byte[] buffer = new byte[fileLength];
+					FileInputStream fileInputStream = null;
+					try {
+						fileInputStream = new FileInputStream(file);
+						fileInputStream.read(buffer);
+					} finally {
+						if (fileInputStream != null)
+							fileInputStream.close();
+					}
+					outPutStream.write(buffer, 0, fileLength);
+
+					outPutStream.flush();
+				} catch (Exception e) {
+
+				}
+
+			} else {
+				// send the headers
+				out.println("HTTP/1.0 404 Not Found");
+				out.println("Content-Type: text/html");
+				out.println("Server: Bot");
+				// this blank line signals the end of the headers
+				out.println("");
+				// Send the HTML page
+				out.println("<H1>ERREUR 404 NOT FOUND </H1>");
+				out.println("<H2>Fichier introuvable </H2>");
+				out.flush();
+
+			}
+		} catch (Exception e) {
+			try {
+				out.println("HTTP/1.0 500 Internal Server Error");
+				out.println("Content-Type: text/html");
+				out.println("Server: Bot");
+				// this blank line signals the end of the headers
+				out.println("");
+				// Send the HTML page
+				out.println("<H1>ERREUR 500 Internal Server Error </H1>");
+				out.println("<H2>Erreur interne du Serveur </H2>");
+				out.flush();
+			} catch (Exception ex) {
+
+			}
 		}
 	}
-	
+
 	public void requestPOST(String ressource, PrintWriter out, BufferedOutputStream outPutStream) {
 		
 		String filePath = "\\lib"
@@ -274,17 +298,18 @@ public class WebServer {
 		}
 		
 	}
-	
+
 	public void requestPUT(String ressource, PrintWriter out, BufferedOutputStream outPutStream) {
-		
-	}
-	public void requestHEAD(String ressource, PrintWriter out, BufferedOutputStream outPutStream) {
-		
-	}
-	public void requestDELETE(String ressource, PrintWriter out, BufferedOutputStream outPutStream) {
-		
+
 	}
 
+	public void requestHEAD(String ressource, PrintWriter out, BufferedOutputStream outPutStream) {
+
+	}
+
+	public void requestDELETE(String ressource, PrintWriter out, BufferedOutputStream outPutStream) {
+
+	}
 
 	/**
 	 * Start the application.
