@@ -2,28 +2,17 @@
 
 package http.server;
 
-import java.awt.image.BufferedImage;
 import java.io.BufferedInputStream;
 import java.io.BufferedOutputStream;
 import java.io.BufferedReader;
-import java.io.ByteArrayInputStream;
-import java.io.ByteArrayOutputStream;
 import java.io.File;
 import java.io.FileInputStream;
 import java.io.FileOutputStream;
-import java.io.FileReader;
-import java.io.IOException;
 import java.io.InputStreamReader;
-import java.io.OutputStream;
 import java.io.PrintWriter;
 import java.net.ServerSocket;
 import java.net.Socket;
-import java.nio.ByteBuffer;
-import java.nio.file.Files;
-import java.nio.file.Paths;
-import java.util.Base64;
 
-import javax.imageio.ImageIO;
 
 /**
  * Example program from Chapter 1 Programming Spiders, Bots and Aggregators in
@@ -72,6 +61,7 @@ public class WebServer {
 				String str = ".";
 				String request = "";
 				String ressource = "";
+				String filePath = "C:\\Users\\ihssa\\OneDrive\\Documents\\GitHub\\Server-HTTP\\lib\\";
 				while (str != null && !str.equals("")) {
 					str = in.readLine();
 					request = request + str + "\n";
@@ -83,21 +73,21 @@ public class WebServer {
 					ressource = ressource.replace("GET /", "");
 					ressource = ressource.replace(" HTTP/1.1", "");
 					System.out.println(request);
-					requestGET(ressource, out, outputStream);
+					requestGET(filePath, ressource, out, outputStream);
 					request = "";
 					remote.close();
 				} else if (request.startsWith("PUT")) {
 					ressource = ressource.replace("PUT /", "");
 					ressource = ressource.replace(" HTTP/1.1", "");
 					System.out.println(request);
-					requestPUT(ressource, out, outputStream, inputStream);
+					requestPUT(filePath, ressource, out, outputStream, inputStream);
 					request = "";
 					remote.close();
 				} else if (request.startsWith("POST")) {
 					ressource = ressource.replace("POST /", "");
 					ressource = ressource.replace(" HTTP/1.1", "");
 					System.out.println(request);
-					requestPOST(ressource, out, outputStream, inputStream);
+					requestPOST(filePath, ressource, out, outputStream, inputStream);
 					request = "";
 					remote.close();
 				} else if (request.startsWith("HEAD")) {
@@ -105,14 +95,14 @@ public class WebServer {
 					ressource = ressource.replace("HEAD /", "");
 					ressource = ressource.replace(" HTTP/1.1", "");
 					System.out.println("HEAD request: " + request);
-					requestHEAD(ressource, out);
+					requestHEAD(filePath, ressource, out);
 					request = "";
 					remote.close();
 				} else if (request.startsWith("DELETE")) {
 					ressource = ressource.replace("DELETE /", "");
 					ressource = ressource.replace(" HTTP/1.1", "");
 					System.out.println(request);
-					requestDELETE(ressource, out, outputStream);
+					requestDELETE(filePath,ressource, out, outputStream);
 					request = "";
 					remote.close();
 				}
@@ -138,7 +128,7 @@ public class WebServer {
 
 		else if (extension.equals(".pdf"))
 			contentType = "application/pdf";
-		
+
 		else if (extension.equals(".zip"))
 			contentType = "application/zip";
 
@@ -147,7 +137,7 @@ public class WebServer {
 
 		else if (extension.equals(".mp4") || extension.equals(".mov"))
 			contentType = "video/mp4";
-		
+
 		else if (extension.equals(".mp3")|| extension.equals(".m4a"))
 			contentType = "audio";
 
@@ -155,11 +145,10 @@ public class WebServer {
 
 	}
 
-	public void requestGET(String ressource, PrintWriter out, BufferedOutputStream outPutStream) {
+	public void requestGET(String filePath, String ressource, PrintWriter out, BufferedOutputStream outPutStream) {
 
 		try {
-			String filePath = "C:\\Users\\ihssa\\OneDrive\\Documents\\GitHub\\Server-HTTP\\lib\\"
-					+ ressource;
+			filePath = filePath + ressource;
 			File file = new File(filePath);
 			int fileLength = (int) file.length();
 			String extension = "";
@@ -215,7 +204,7 @@ public class WebServer {
 				out.println("");
 				// Send the HTML page
 				out.println("<H1>ERREUR 404 NOT FOUND </H1>");
-				out.println("<H2>Fichier introuvable </H2>");
+				out.println("<H2>Fichier introuvable : " + ressource + "</H2>");
 				out.flush();
 
 			}
@@ -237,16 +226,16 @@ public class WebServer {
 	}
 
 
-	public void requestPOST(String ressource, PrintWriter out, BufferedOutputStream outPutStream, BufferedInputStream inputStream) {
-		
+	public void requestPOST(String filePath, String ressource, PrintWriter out, BufferedOutputStream outPutStream, BufferedInputStream inputStream) {
+
 		try {
 
-			File file = new File( "C:\\Users\\ihssa\\OneDrive\\Documents\\GitHub\\Server-HTTP\\lib\\"+ ressource);
+			File file = new File( filePath + ressource );
 			Boolean exists = file.exists();
 			Boolean isFile = file.isFile();
-			
+
 			BufferedOutputStream fileOutput = new BufferedOutputStream(new FileOutputStream(file, file.exists()));
-			
+
 			int fileLength = (int) file.length();
 			byte[] buffer;
 			if (file.length() == 0) {
@@ -254,14 +243,14 @@ public class WebServer {
 			}
 			buffer = new byte[fileLength];
 
-			
+
 			while (inputStream.available() > 0) {
 				int nbRead = inputStream.read(buffer);
 				fileOutput.write(buffer, 0, nbRead);
 			}
 			fileOutput.flush();
 			fileOutput.close();
-			
+
 			if(exists && isFile) {
 				out.println("HTTP/1.0 200 OK");
 				out.println("Content-Type: text/html");
@@ -269,7 +258,8 @@ public class WebServer {
 				// this blank line signals the end of the headers
 				out.println("");
 				// Send the HTML page
-				out.println("<H1>Post Reussi </H1>");
+				out.println("<H1>POST: Updated </H1>");
+				out.println("<H2>Fichier mis à jour : " + ressource + "</H2>");
 				out.flush();
 			}else {
 				out.println("HTTP/1.0 201 Created");
@@ -278,10 +268,11 @@ public class WebServer {
 				// this blank line signals the end of the headers
 				out.println("");
 				// Send the HTML page
-				out.println("<H1>Post Reussi </H1>");
+				out.println("<H1>POST: Created </H1>");
+				out.println("<H2>Fichier créé : " + ressource + "</H2>");
 				out.flush();
 			}
-			
+
 
 		} catch (Exception e) {
 			try {
@@ -300,17 +291,17 @@ public class WebServer {
 		}
 	}
 
-	public void requestPUT(String ressource, PrintWriter out, BufferedOutputStream outputStream, BufferedInputStream inputStream) {
+	public void requestPUT(String filePath, String ressource, PrintWriter out, BufferedOutputStream outputStream, BufferedInputStream inputStream) {
 		try {
 
-			File file = new File( "C:\\Users\\ihssa\\OneDrive\\Documents\\GitHub\\Server-HTTP\\lib\\"+ ressource);
+			File file = new File( filePath + ressource);
 			Boolean exists = file.exists();
 			Boolean isFile = file.isFile();
-			
-			
+
+
 			PrintWriter printWriter = new PrintWriter(file);
 			byte[] buffer = new byte[256];
-			
+
 			while (inputStream.available() > 0) {
 				printWriter.println(buffer.toString());
 			}
@@ -326,6 +317,7 @@ public class WebServer {
 				out.println("");
 				// Send the HTML page
 				out.println("<H1>PUT : No Content in File </H1>");
+				out.println("<H2>Fichier vidé de ce contenu : " + ressource + "</H2>");
 				out.flush();
 			}else {
 				out.println("HTTP/1.0 201 Created");
@@ -334,10 +326,11 @@ public class WebServer {
 				// this blank line signals the end of the headers
 				out.println("");
 				// Send the HTML page
-				out.println("<H1>POST: File Created </H1>");
+				out.println("<H1>PUT: File Created </H1>");
+				out.println("<H2>Fichier créé : " + ressource + "</H2>");
 				out.flush();
 			}
-			
+
 
 		} catch (Exception e) {
 			try {
@@ -356,11 +349,10 @@ public class WebServer {
 		}
 	}
 
-	public void requestHEAD(String ressource, PrintWriter out) {
+	public void requestHEAD(String filePath, String ressource, PrintWriter out) {
 
 		try {
-			String filePath = "C:\\Users\\drape\\Documents\\4IF\\Programmation rï¿½seaux\\Prog_reseaux_HTTP\\TP-HTTP-Code\\lib\\"
-					+ ressource;
+			filePath = filePath + ressource;
 			File file = new File(filePath);
 			int fileLength = (int) file.length();
 			String extension = "";
@@ -385,7 +377,7 @@ public class WebServer {
 				out.println("Content-Length: " + fileLength);
 				out.println("");
 				out.flush();
-				
+
 			} else {
 				// send the headers
 				out.println("HTTP/1.0 404 Not Found");
@@ -407,7 +399,7 @@ public class WebServer {
 		}
 	}
 
-	public void requestDELETE(String ressource, PrintWriter out, BufferedOutputStream outputStream) {
+	public void requestDELETE(String filePath, String ressource, PrintWriter out, BufferedOutputStream outputStream) {
 
 	}
 
