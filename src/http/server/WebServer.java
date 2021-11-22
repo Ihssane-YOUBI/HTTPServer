@@ -269,7 +269,7 @@ public class WebServer {
 				out.println("");
 				// Send the HTML page
 				out.println("<H1>POST: Created </H1>");
-				out.println("<H2>Fichier cr�� : " + ressource + "</H2>");
+				out.println("<H2>Fichier cree : " + ressource + "</H2>");
 				out.flush();
 			}
 
@@ -309,7 +309,6 @@ public class WebServer {
 			printWriter.close();
 
 			if(exists && isFile) {
-				System.out.println("je suis dans le if");
 				out.println("HTTP/1.0 200 OK");
 				out.println("Content-Type: text/html");
 				out.println("Server: Bot");
@@ -327,7 +326,7 @@ public class WebServer {
 				out.println("");
 				// Send the HTML page
 				out.println("<H1>PUT: File Created </H1>");
-				out.println("<H2>Fichier cr�� : " + ressource + "</H2>");
+				out.println("<H2>Fichier cree : " + ressource + "</H2>");
 				out.flush();
 			}
 
@@ -372,7 +371,7 @@ public class WebServer {
 				// send the headers
 
 				out.println("HTTP/1.0 200 OK");
-				out.println("Content-Type :" + getContentType(extension));
+				out.println("Content-Type: text/html");
 				out.println("Server: Bot");
 				out.println("Content-Length: " + fileLength);
 				out.println("");
@@ -409,36 +408,29 @@ public class WebServer {
 				extension = ressource.substring(ressource.indexOf("."));
 			}
 
-			if (ressource.equals("")) {
-				// send the headers
-				out.println("HTTP/1.0 200 OK");
-				out.println("Content-Type: text/html");
-				out.println("Server: Bot");
-				out.println("");
-				out.println("<H1>You can't delete the main page.</H1>");
-				out.flush();
-
-			} else if (file.exists() && file.isFile()) {
+			if (file.exists() && file.isFile()) {
 				if (file.delete()) {
 					// send the headers
 					out.println("HTTP/1.0 200 OK");
-					out.println("Content-Type :" + getContentType(extension));
+					out.println("Content-Type: text/html");
 					out.println("Server: Bot");
-					out.println("Content-Length: " + fileLength);
+//					out.println("Content-Length: " + fileLength);
 					out.println("");
 					out.println("<H1>File has been deleted.</H1>");
+					out.println("<H2>Fichier supprime : " + ressource + "</H2>");
 					out.flush();
 				} else {
 					// send the headers
 					out.println("HTTP/1.0 403 Forbidden");
-					out.println("Content-Type :" + getContentType(extension));
+					out.println("Content-Type: text/html");
 					out.println("Server: Bot");
-					out.println("Content-Length: " + fileLength);
+//					out.println("Content-Length: " + fileLength);
 					out.println("");
 					out.println("<H1>You don't have the right to delete the file.</H1>");
+					out.println("<H2>Fichier : " + ressource + "</H2>");
 					out.flush();
 				}
-				
+
 			} else {
 				// send the headers
 				out.println("HTTP/1.0 404 Not Found");
@@ -446,6 +438,7 @@ public class WebServer {
 				out.println("Server: Bot");
 				out.println("");
 				out.println("<H1>File not found. It can't be deleted.</H1>");
+				out.println("<H2>Fichier : " + ressource + "</H2>");
 				out.flush();
 			}
 		} catch (Exception e) {
