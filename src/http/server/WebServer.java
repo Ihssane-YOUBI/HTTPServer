@@ -32,7 +32,7 @@ public class WebServer {
 	protected void start() {
 		ServerSocket s;
 
-		System.out.println("Webserver starting up on port 80");
+		System.out.println("Webserver starting up on port 1234");
 		System.out.println("(press ctrl-c to exit)");
 		try {
 			// create the main server socket
@@ -61,7 +61,7 @@ public class WebServer {
 				String str = ".";
 				String request = "";
 				String ressource = "";
-				String filePath = "C:\\Users\\ihssa\\OneDrive\\Documents\\GitHub\\Server-HTTP\\lib\\";
+				String filePath = "C:\\Users\\drape\\Documents\\4IF\\Programmation réseaux\\HTTPServer\\lib\\";
 				while (str != null && !str.equals("")) {
 					str = in.readLine();
 					request = request + str + "\n";
@@ -259,7 +259,7 @@ public class WebServer {
 				out.println("");
 				// Send the HTML page
 				out.println("<H1>POST: Updated </H1>");
-				out.println("<H2>Fichier mis ï¿½ jour : " + ressource + "</H2>");
+				out.println("<H2>Fichier mis a jour : " + ressource + "</H2>");
 				out.flush();
 			}else {
 				out.println("HTTP/1.0 201 Created");
@@ -316,7 +316,7 @@ public class WebServer {
 				out.println("");
 				// Send the HTML page
 				out.println("<H1>PUT : No Content in File </H1>");
-				out.println("<H2>Fichier vidï¿½ de ce contenu : " + ressource + "</H2>");
+				out.println("<H2>Fichier vide de ce contenu : " + ressource + "</H2>");
 				out.flush();
 			}else {
 				out.println("HTTP/1.0 201 Created");
@@ -371,7 +371,7 @@ public class WebServer {
 				// send the headers
 
 				out.println("HTTP/1.0 200 OK");
-				out.println("Content-Type: text/html");
+				out.println("Content-Type :" + getContentType(extension));
 				out.println("Server: Bot");
 				out.println("Content-Length: " + fileLength);
 				out.println("");
@@ -402,11 +402,6 @@ public class WebServer {
 		try {
 			filePath = filePath + ressource;
 			File file = new File(filePath);
-			int fileLength = (int) file.length();
-			String extension = "";
-			if (ressource.contains(".")) {
-				extension = ressource.substring(ressource.indexOf("."));
-			}
 
 			if (file.exists() && file.isFile()) {
 				if (file.delete()) {
