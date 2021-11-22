@@ -112,7 +112,7 @@ public class WebServer {
 					ressource = ressource.replace("DELETE /", "");
 					ressource = ressource.replace(" HTTP/1.1", "");
 					System.out.println(request);
-					requestDELETE(ressource, out, outputStream);
+					requestDELETE(ressource, out);
 					request = "";
 					remote.close();
 				}
@@ -344,8 +344,67 @@ public class WebServer {
 		}
 	}
 
-	public void requestDELETE(String ressource, PrintWriter out, BufferedOutputStream outputStream) {
+	public void requestDELETE(String ressource, PrintWriter out) {
+		try {
+			String filePath = "C:\\Users\\drape\\Documents\\4IF\\Programmation réseaux\\Prog_reseaux_HTTP\\TP-HTTP-Code\\lib\\"
+					+ ressource;
+			File file = new File(filePath);
+			int fileLength = (int) file.length();
+			String extension = "";
+			if (ressource.contains(".")) {
+				extension = ressource.substring(ressource.indexOf("."));
+			}
 
+			if (ressource.equals("")) {
+				// send the headers
+				out.println("HTTP/1.0 200 OK");
+				out.println("Content-Type: text/html");
+				out.println("Server: Bot");
+				out.println("");
+				out.println("<H1>You can't delete the main page.</H1>");
+				out.flush();
+
+			} else if (file.exists() && file.isFile()) {
+				if (file.delete()) {
+					// send the headers
+					out.println("HTTP/1.0 200 OK");
+					out.println("Content-Type :" + getContentType(extension));
+					out.println("Server: Bot");
+					out.println("Content-Length: " + fileLength);
+					out.println("");
+					out.println("<H1>File has been deleted.</H1>");
+					out.flush();
+				} else {
+					// send the headers
+					out.println("HTTP/1.0 403 Forbidden");
+					out.println("Content-Type :" + getContentType(extension));
+					out.println("Server: Bot");
+					out.println("Content-Length: " + fileLength);
+					out.println("");
+					out.println("<H1>You don't have the right to delete the file.</H1>");
+					out.flush();
+				}
+				
+			} else {
+				// send the headers
+				out.println("HTTP/1.0 404 Not Found");
+				out.println("Content-Type: text/html");
+				out.println("Server: Bot");
+				out.println("");
+				out.println("<H1>File not found. It can't be deleted.</H1>");
+				out.flush();
+			}
+		} catch (Exception e) {
+			try {
+				out.println("HTTP/1.0 500 Internal Server Error");
+				out.println("Content-Type: text/html");
+				out.println("Server: Bot");
+				out.println("");
+				out.flush();
+			} catch (Exception ex) {
+
+			}
+		}
 	}
 
 	/**
