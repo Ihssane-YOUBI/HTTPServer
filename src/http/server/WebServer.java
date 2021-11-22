@@ -10,6 +10,7 @@ import java.io.ByteArrayInputStream;
 import java.io.ByteArrayOutputStream;
 import java.io.File;
 import java.io.FileInputStream;
+import java.io.FileOutputStream;
 import java.io.FileReader;
 import java.io.IOException;
 import java.io.InputStreamReader;
@@ -156,7 +157,7 @@ public class WebServer {
 	public void requestGET(String ressource, PrintWriter out, BufferedOutputStream outPutStream) {
 
 		try {
-			String filePath = "C:\\Users\\ihssa\\OneDrive\\Bureau\\4IF\\Programmation Réseau\\TP-HTTP-Code\\lib\\"
+			String filePath = "C:\\Users\\ihssa\\OneDrive\\Bureau\\4IF\\Programmation Rï¿½seau\\TP-HTTP-Code\\lib\\"
 					+ ressource;
 			File file = new File(filePath);
 			int fileLength = (int) file.length();
@@ -234,8 +235,56 @@ public class WebServer {
 		}
 	}
 
-	public void requestPOST(String ressource, PrintWriter out, BufferedOutputStream outputStream) {
+	public void requestPOST(String ressource, PrintWriter out, BufferedOutputStream outPutStream, BufferedInputStream inputStream) {
+		
+		try {
 
+			File file = new File("\\lib\\" + ressource);
+			Boolean exists = file.exists();
+			Boolean isFile = file.isFile();
+			BufferedOutputStream fileOutput = new BufferedOutputStream(new FileOutputStream(file, file.exists()));
+			int fileLength = (int) file.length();
+			byte[] buffer = new byte[fileLength];
+
+			while (inputStream.available() > 0) {
+				int nbRead = inputStream.read(buffer);
+				fileOutput.write(buffer, 0, nbRead);
+			}
+			fileOutput.flush();
+			fileOutput.close();
+			if(exists && isFile) {
+				out.println("HTTP/1.0 200 OK");
+				out.println("Content-Type: text/html");
+				out.println("Server: Bot");
+				// this blank line signals the end of the headers
+				out.println("");
+				// Send the HTML page
+				out.println("<H1>Post Rï¿½ussi </H1>");
+				out.flush();
+			}else {
+				out.println("HTTP/1.0 201 Created");
+				out.println("Content-Type: text/html");
+				out.println("Server: Bot");
+				// this blank line signals the end of the headers
+				out.println("");
+				// Send the HTML page
+				out.println("<H1>Post Rï¿½ussi </H1>");
+				out.flush();
+			}
+			
+
+		} catch (Exception e) {
+			out.println("HTTP/1.0 500 Internal Server Error");
+			out.println("Content-Type: text/html");
+			out.println("Server: Bot");
+			// this blank line signals the end of the headers
+			out.println("");
+			// Send the HTML page
+			out.println("<H1>ERREUR 500 Internal Server Error </H1>");
+			out.println("<H2>Erreur interne du Serveur </H2>");
+			out.flush();
+		}
+		
 	}
 
 	public void requestPUT(String ressource, PrintWriter out, BufferedOutputStream outputStream, BufferedInputStream inputStream) {
