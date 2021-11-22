@@ -97,7 +97,7 @@ public class WebServer {
 					ressource = ressource.replace("POST /", "");
 					ressource = ressource.replace(" HTTP/1.1", "");
 					System.out.println(request);
-					requestPOST(ressource, out, outputStream);
+					requestPOST(ressource, out, outputStream, inputStream);
 					request = "";
 					remote.close();
 				} else if (request.startsWith("HEAD")) {
@@ -130,25 +130,25 @@ public class WebServer {
 		if (extension.equals(".html") || extension.equals(".htm"))
 			contentType = "text/html";
 
-		// else if (extension.equals(".png"))
-		// out.println("Content-Type: image/png");
-
-		else if (extension.equals(".jpeg") || extension.equals(".jpg") || extension.equals(".png"))
-			contentType = "Image";
+		else if (extension.equals(".jpeg") || extension.equals(".jpg") || extension.equals(".png") || extension.equals(".gif"))
+			contentType = "image/" + extension.replace(".", "");
 
 		else if (extension.equals(".css"))
 			contentType = "text/css";
 
 		else if (extension.equals(".pdf"))
 			contentType = "application/pdf";
+		
+		else if (extension.equals(".zip"))
+			contentType = "application/zip";
 
 		else if (extension.equals(".odt"))
 			contentType = "application/vnd.oasis.opendocument.text";
 
-		else if (extension.equals(".mp4"))
+		else if (extension.equals(".mp4") || extension.equals(".mov"))
 			contentType = "video/mp4";
-
-		else if (extension.equals(".mp3"))
+		
+		else if (extension.equals(".mp3")|| extension.equals(".m4a"))
 			contentType = "audio";
 
 		return contentType;
