@@ -146,7 +146,7 @@ public class WebServer {
 
 	public void requestGET(String ressource, PrintWriter out, BufferedOutputStream outPutStream) {
 
-		String filePath = "C:\\Users\\ihssa\\OneDrive\\Bureau\\4IF\\Programmation Réseau\\TP-HTTP-Code\\lib\\"
+		String filePath = "D:\\Programmation réseaux\\HTTPServer\\lib"
 				+ ressource;
 		File file = new File(filePath);
 		int fileLength = (int) file.length();
@@ -170,7 +170,6 @@ public class WebServer {
 			// send the headers
 
 			out.println("HTTP/1.0 200 OK");
-			out.println("Content-Type: " + extension);
 			out.println("Content-Type :" + getContentType(extension));
 			out.println("Server: Bot");
 			out.println("Content-Length: " + fileLength);
@@ -211,6 +210,68 @@ public class WebServer {
 	}
 	
 	public void requestPOST(String ressource, PrintWriter out, BufferedOutputStream outPutStream) {
+		
+		String filePath = "\\lib"
+				+ ressource;
+		File file = new File(filePath);
+		int fileLength = (int) file.length();
+		String extension = "";
+		if (ressource.contains(".")) {
+			extension = ressource.substring(ressource.indexOf("."));
+		}
+
+		if (ressource.equals("")) {
+			// send the headers
+			out.println("HTTP/1.0 200 OK");
+			out.println("Content-Type: text/html");
+			out.println("Server: Bot");
+			// this blank line signals the end of the headers
+			out.println("");
+			// Send the HTML page
+			out.println("<H1>Welcome to the Ultra Mini-WebServer</H1>");
+			out.flush();
+
+		} else if (file.exists() && file.isFile()) {
+			// send the headers
+
+			out.println("HTTP/1.0 200 OK");
+			out.println("Content-Type :" + getContentType(extension));
+			out.println("Server: Bot");
+			out.println("Content-Length: " + fileLength);
+			out.println("");
+			out.flush();
+			try {
+
+				// Content
+				byte[] buffer = new byte[fileLength];
+				FileInputStream fileInputStream = null;
+				try {
+					fileInputStream = new FileInputStream(file);
+					fileInputStream.read(buffer);
+				} finally {
+					if (fileInputStream != null)
+						fileInputStream.close();
+				}
+				outPutStream.write(buffer, 0, fileLength);
+
+				outPutStream.flush();
+			} catch (Exception e) {
+
+			}
+
+		} else {
+			// send the headers
+			out.println("HTTP/1.0 404 Not Found");
+			out.println("Content-Type: text/html");
+			out.println("Server: Bot");
+			// this blank line signals the end of the headers
+			out.println("");
+			// Send the HTML page
+			out.println("<H1>ERREUR 404 NOT FOUND </H1>");
+			out.println("<H2>Fichier introuvable </H2>");
+			out.flush();
+
+		}
 		
 	}
 	
