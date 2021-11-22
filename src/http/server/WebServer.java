@@ -10,6 +10,7 @@ import java.io.ByteArrayInputStream;
 import java.io.ByteArrayOutputStream;
 import java.io.File;
 import java.io.FileInputStream;
+import java.io.FileOutputStream;
 import java.io.FileReader;
 import java.io.IOException;
 import java.io.InputStreamReader;
@@ -233,68 +234,54 @@ public class WebServer {
 		}
 	}
 
-	public void requestPOST(String ressource, PrintWriter out, BufferedOutputStream outPutStream) {
+	public void requestPOST(String ressource, PrintWriter out, BufferedOutputStream outPutStream, BufferedInputStream inputStream) {
 		
-		String filePath = "\\lib"
-				+ ressource;
-		File file = new File(filePath);
-		int fileLength = (int) file.length();
-		String extension = "";
-		if (ressource.contains(".")) {
-			extension = ressource.substring(ressource.indexOf("."));
-		}
+		try {
 
-		if (ressource.equals("")) {
-			// send the headers
-			out.println("HTTP/1.0 200 OK");
-			out.println("Content-Type: text/html");
-			out.println("Server: Bot");
-			// this blank line signals the end of the headers
-			out.println("");
-			// Send the HTML page
-			out.println("<H1>Welcome to the Ultra Mini-WebServer</H1>");
-			out.flush();
+			File file = new File("\\lib\\" + ressource);
+			Boolean exists = file.exists();
+			Boolean isFile = file.isFile();
+			BufferedOutputStream fileOutput = new BufferedOutputStream(new FileOutputStream(file, file.exists()));
+			int fileLength = (int) file.length();
+			byte[] buffer = new byte[fileLength];
 
-		} else if (file.exists() && file.isFile()) {
-			// send the headers
-
-			out.println("HTTP/1.0 200 OK");
-			out.println("Content-Type :" + getContentType(extension));
-			out.println("Server: Bot");
-			out.println("Content-Length: " + fileLength);
-			out.println("");
-			out.flush();
-			try {
-
-				// Content
-				byte[] buffer = new byte[fileLength];
-				FileInputStream fileInputStream = null;
-				try {
-					fileInputStream = new FileInputStream(file);
-					fileInputStream.read(buffer);
-				} finally {
-					if (fileInputStream != null)
-						fileInputStream.close();
-				}
-				outPutStream.write(buffer, 0, fileLength);
-
-				outPutStream.flush();
-			} catch (Exception e) {
-
+			while (inputStream.available() > 0) {
+				int nbRead = inputStream.read(buffer);
+				fileOutput.write(buffer, 0, nbRead);
 			}
+			fileOutput.flush();
+			fileOutput.close();
+			if(exists && isFile) {
+				out.println("HTTP/1.0 200 OK");
+				out.println("Content-Type: text/html");
+				out.println("Server: Bot");
+				// this blank line signals the end of the headers
+				out.println("");
+				// Send the HTML page
+				out.println("<H1>Post Réussi </H1>");
+				out.flush();
+			}else {
+				out.println("HTTP/1.0 201 Created");
+				out.println("Content-Type: text/html");
+				out.println("Server: Bot");
+				// this blank line signals the end of the headers
+				out.println("");
+				// Send the HTML page
+				out.println("<H1>Post Réussi </H1>");
+				out.flush();
+			}
+			
 
-		} else {
-			// send the headers
-			out.println("HTTP/1.0 404 Not Found");
+		} catch (Exception e) {
+			out.println("HTTP/1.0 500 Internal Server Error");
 			out.println("Content-Type: text/html");
 			out.println("Server: Bot");
 			// this blank line signals the end of the headers
 			out.println("");
 			// Send the HTML page
-			out.println("<H1>ERREUR 404 NOT FOUND </H1>");
-			out.println("<H2>Fichier introuvable </H2>");
+			out.println("<H1>ERREUR 500 Internal Server Error </H1>");
+			out.println("<H2>Erreur interne du Serveur </H2>");
 			out.flush();
-
 		}
 		
 	}
