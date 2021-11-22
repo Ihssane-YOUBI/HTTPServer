@@ -61,7 +61,8 @@ public class WebServer {
 				System.out.println("Connection, sending data.");
 				BufferedReader in = new BufferedReader(new InputStreamReader(remote.getInputStream()));
 				PrintWriter out = new PrintWriter(remote.getOutputStream());
-				BufferedOutputStream outPutStream = new BufferedOutputStream(remote.getOutputStream());
+				BufferedOutputStream outputStream = new BufferedOutputStream(remote.getOutputStream());
+				BufferedInputStream inputStream = new BufferedInputStream(remote.getInputStream());
 
 				// read the data sent. We basically ignore it,
 				// stop reading once a blank line is hit. This
@@ -81,35 +82,35 @@ public class WebServer {
 					ressource = ressource.replace("GET /", "");
 					ressource = ressource.replace(" HTTP/1.1", "");
 					System.out.println(request);
-					requestGET(ressource, out, outPutStream);
+					requestGET(ressource, out, outputStream);
 					request = "";
 					remote.close();
 				} else if (request.startsWith("PUT")) {
 					ressource = ressource.replace("PUT /", "");
 					ressource = ressource.replace(" HTTP/1.1", "");
 					System.out.println(request);
-					requestPUT(ressource, out, outPutStream);
+					requestPUT(ressource, out, outputStream, inputStream);
 					request = "";
 					remote.close();
 				} else if (request.startsWith("POST")) {
 					ressource = ressource.replace("POST /", "");
 					ressource = ressource.replace(" HTTP/1.1", "");
 					System.out.println(request);
-					requestPOST(ressource, out, outPutStream);
+					requestPOST(ressource, out, outputStream);
 					request = "";
 					remote.close();
 				} else if (request.startsWith("HEAD")) {
 					ressource = ressource.replace("HEAD /", "");
 					ressource = ressource.replace(" HTTP/1.1", "");
 					System.out.println(request);
-					requestHEAD(ressource, out, outPutStream);
+					requestHEAD(ressource, out, outputStream);
 					request = "";
 					remote.close();
 				} else if (request.startsWith("DELETE")) {
 					ressource = ressource.replace("DELETE /", "");
 					ressource = ressource.replace(" HTTP/1.1", "");
 					System.out.println(request);
-					requestDELETE(ressource, out, outPutStream);
+					requestDELETE(ressource, out, outputStream);
 					request = "";
 					remote.close();
 				}
@@ -125,28 +126,28 @@ public class WebServer {
 		String contentType = null;
 
 		if (extension.equals(".html") || extension.equals(".htm"))
-			contentType = "Content-Type: text/html";
+			contentType = "text/html";
 
 		// else if (extension.equals(".png"))
 		// out.println("Content-Type: image/png");
 
 		else if (extension.equals(".jpeg") || extension.equals(".jpg") || extension.equals(".png"))
-			contentType = "Content-Type: Image";
+			contentType = "Image";
 
 		else if (extension.equals(".css"))
-			contentType = "Content-Type: text/css";
+			contentType = "text/css";
 
 		else if (extension.equals(".pdf"))
-			contentType = "Content-Type: application/pdf";
+			contentType = "application/pdf";
 
 		else if (extension.equals(".odt"))
-			contentType = "Content-Type: application/vnd.oasis.opendocument.text";
+			contentType = "application/vnd.oasis.opendocument.text";
 
 		else if (extension.equals(".mp4"))
-			contentType = "Content-Type: video/mp4";
+			contentType = "video/mp4";
 
 		else if (extension.equals(".mp3"))
-			contentType = "Content-Type: audio";
+			contentType = "audio";
 
 		return contentType;
 
@@ -233,19 +234,19 @@ public class WebServer {
 		}
 	}
 
-	public void requestPOST(String ressource, PrintWriter out, BufferedOutputStream outPutStream) {
+	public void requestPOST(String ressource, PrintWriter out, BufferedOutputStream outputStream) {
 
 	}
 
-	public void requestPUT(String ressource, PrintWriter out, BufferedOutputStream outPutStream) {
+	public void requestPUT(String ressource, PrintWriter out, BufferedOutputStream outputStream, BufferedInputStream inputStream) {
+		
+	}
+
+	public void requestHEAD(String ressource, PrintWriter out, BufferedOutputStream outputStream) {
 
 	}
 
-	public void requestHEAD(String ressource, PrintWriter out, BufferedOutputStream outPutStream) {
-
-	}
-
-	public void requestDELETE(String ressource, PrintWriter out, BufferedOutputStream outPutStream) {
+	public void requestDELETE(String ressource, PrintWriter out, BufferedOutputStream outputStream) {
 
 	}
 
