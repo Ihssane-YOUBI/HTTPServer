@@ -3,7 +3,19 @@ package http.client;
 import java.net.InetAddress;
 import java.net.Socket;
 
+/**
+ * A web client that can connect itself to the web server.
+ * Enables to test the connect to a server given its host name and its port number.
+ * 
+ * @author Basma BELAHCEN, Ihssane YOUBI et Emma DRAPEAU
+ */
 public class WebPing {
+	
+	/**
+	 * Connects to the server identified by parameters if the server is accessible.
+	 * 
+	 * @param args "server host name" "server port number"
+	 */
   public static void main(String[] args) {
   
       if (args.length != 2) {

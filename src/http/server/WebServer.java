@@ -15,19 +15,18 @@ import java.net.Socket;
 
 
 /**
+ * A HTTP web server that response to basic HTTP requests.
+ * 
+ * The code is based on :
  * Example program from Chapter 1 Programming Spiders, Bots and Aggregators in
  * Java Copyright 2001 by Jeff Heaton
- * 
- * WebServer is a very simple web-server. Any request is responded with a very
- * simple web-page.
- * 
- * @author Jeff Heaton
- * @version 1.0
  */
 public class WebServer {
 
 	/**
 	 * WebServer constructor.
+	 * Manages the treatment of HTTP request from different clients.
+	 * Used port is 1234.
 	 */
 	protected void start() {
 		ServerSocket s;
@@ -113,6 +112,13 @@ public class WebServer {
 		}
 	}
 
+	/**
+	 * Creates and returns the correct content type corresponding the extension file.
+	 * 
+	 * @param extension The extension of the file
+	 * 
+	 * @return ContentType to put in the HTTP response header
+	 */
 	public String getContentType(String extension) {
 
 		String contentType = null;
@@ -145,6 +151,15 @@ public class WebServer {
 
 	}
 
+	/**
+	 * Responses to a GET request. Sends the header and displays the content of the resource that is to get 
+	 * if it exists. Else returns and display error 404 Not Found message.
+	 * 
+	 * @param filePath The path to the resource to get
+	 * @param ressource The name of the resource to get
+	 * @param out The output stream of remote socket (as a PrintWriter)
+	 * @param outPutStream The output stream of remote socket (as a BufferedOutputStream)
+	 */
 	public void requestGET(String filePath, String ressource, PrintWriter out, BufferedOutputStream outPutStream) {
 
 		try {
@@ -226,6 +241,16 @@ public class WebServer {
 	}
 
 
+	/**
+	 * Responses to a POST request. Sends the header and updates the content of the resource if it exists.
+	 * Else creates it.
+	 * 
+	 * @param filePath The path to the resource
+	 * @param ressource The name of the resource to deal with
+	 * @param out The output stream of remote socket (as a PrintWriter)
+	 * @param outPutStream The output stream of remote socket (as a BufferedOutputStream)
+	 * @param inputStream The input stream of remote socket (as a BufferedOutputStream)
+	 */
 	public void requestPOST(String filePath, String ressource, PrintWriter out, BufferedOutputStream outPutStream, BufferedInputStream inputStream) {
 
 		try {
@@ -291,6 +316,16 @@ public class WebServer {
 		}
 	}
 
+	/**
+	 * Responses to a PUT request. Sends the header and empty the content of the resource if it exists.
+	 * Else creates it empty.
+	 * 
+	 * @param filePath The path to the resource
+	 * @param ressource The name of the resource to deal with
+	 * @param out The output stream of remote socket (as a PrintWriter)
+	 * @param outputStream The output stream of remote socket (as a BufferedOutputStream)
+	 * @param inputStream The input stream of remote socket (as a BufferedOutputStream)
+	 */
 	public void requestPUT(String filePath, String ressource, PrintWriter out, BufferedOutputStream outputStream, BufferedInputStream inputStream) {
 		try {
 
@@ -348,6 +383,14 @@ public class WebServer {
 		}
 	}
 
+	/**
+	 * Responses to a HEAD request. Sends the header corresponding to the resource if it exists.
+	 * Else returns an error 404 Not Found header.
+	 * 
+	 * @param filePath The path to the resource to get
+	 * @param ressource The name of the resource to get
+	 * @param out The output stream of remote socket (as a PrintWriter)
+	 */
 	public void requestHEAD(String filePath, String ressource, PrintWriter out) {
 
 		try {
@@ -398,6 +441,15 @@ public class WebServer {
 		}
 	}
 
+	/**
+	 * Responses to a DELETE request. Deletes the resource if it exists and if the access rights allow it.
+	 * If the resource can't be deleted, returns an error 403 Forbidden.
+	 * Else returns an error 404 Not Found header if the resource doesn't exist.
+	 * 
+	 * @param filePath The path to the resource to get
+	 * @param ressource The name of the resource to get
+	 * @param out The output stream of remote socket (as a PrintWriter)
+	 */
 	public void requestDELETE(String filePath, String ressource, PrintWriter out) {
 		try {
 			filePath = filePath + ressource;
@@ -409,7 +461,6 @@ public class WebServer {
 					out.println("HTTP/1.0 200 OK");
 					out.println("Content-Type: text/html");
 					out.println("Server: Bot");
-//					out.println("Content-Length: " + fileLength);
 					out.println("");
 					out.println("<H1>File has been deleted.</H1>");
 					out.println("<H2>Fichier supprime : " + ressource + "</H2>");
@@ -419,7 +470,6 @@ public class WebServer {
 					out.println("HTTP/1.0 403 Forbidden");
 					out.println("Content-Type: text/html");
 					out.println("Server: Bot");
-//					out.println("Content-Length: " + fileLength);
 					out.println("");
 					out.println("<H1>You don't have the right to delete the file.</H1>");
 					out.println("<H2>Fichier : " + ressource + "</H2>");
