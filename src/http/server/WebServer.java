@@ -40,7 +40,7 @@ public class WebServer {
 	 * @see java.net.ServerSocket
 	 * @see java.net.Socket
 	 */
-	public void start() {
+	protected void start() {
 		ServerSocket s;
 
 		System.out.println("Webserver starting up on port 1234");
