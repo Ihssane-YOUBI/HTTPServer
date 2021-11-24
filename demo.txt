@@ -13,16 +13,16 @@ Démo HTTP Web Server :
 		- http://localhost:1234/fraise.png
 		- http://localhost:1234/cerise.svg
 		- http://localhost:1234/pomme.gif
+	* Les pdf :
+		- http://localhost:1234/Facts.pdf
 	* Les audios :
 		- http://localhost:1234/BuenaVista.mp3
 	* Les vidéos :
 		- http://localhost:1234/pub.mp4
-	* Les pdf :
-		- http://localhost:1234/Contrat.pdf
 4) Tester depuis postman
 	* GET
-		- http://localhost:1234/fraise.png --> header + taille
 		- http://localhost:1234/nimportequoi --> erreur 404
+		- http://localhost:1234/fraise.png --> header + taille
 	* HEAD
 		- http://localhost:1234/fraise.png --> header + taille
 		- http://localhost:1234/nimportequoi --> erreur 404

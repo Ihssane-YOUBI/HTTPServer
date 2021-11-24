@@ -104,6 +104,16 @@ public class WebServer {
 					requestDELETE(filePath,ressource, out);
 					request = "";
 					remote.close();
+				} else {
+					// send the headers
+					out.println("HTTP/1.0 400 Bad Request");
+					out.println("Content-Type: text/html");
+					out.println("Server: Bot");
+					out.println("");
+					out.println("<H1>The request wasn't recognized.</H1>");
+					out.flush();
+					request = "";
+					remote.close();
 				}
 
 			} catch (Exception e) {
