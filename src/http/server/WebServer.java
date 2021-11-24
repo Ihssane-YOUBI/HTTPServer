@@ -20,16 +20,27 @@ import java.net.Socket;
  * The code is based on :
  * Example program from Chapter 1 Programming Spiders, Bots and Aggregators in
  * Java Copyright 2001 by Jeff Heaton
+ * 
+ * @author Basma BELAHCEN, Ihssane YOUBI et Emma DRAPEAU
  */
 public class WebServer {
 
 	/**
 	 * WebServer constructor.
-	 * Manages the treatment of HTTP request from different clients.
+	 * Manages the treatment of HTTP request from different clients using sockets.
+	 * Supported HTTP requests : GET, HEAD, POST, PUT, DELETE.
 	 * Used port is 1234.
-	 * Supported HTTP requests : GET, HEAD, PUT, POST, DELETE.
+	 * 
+	 * @see WebServer#getContentType(String)
+	 * @see WebServer#requestGET(String, String, PrintWriter, BufferedOutputStream)
+	 * @see WebServer#requestHEAD(String, String, PrintWriter)
+	 * @see WebServer#requestPOST(String, String, PrintWriter, BufferedOutputStream, BufferedInputStream)
+	 * @see WebServer#requestPUT(String, String, PrintWriter, BufferedOutputStream, BufferedInputStream)
+	 * @see WebServer#requestDELETE(String, String, PrintWriter)
+	 * @see java.net.ServerSocket
+	 * @see java.net.Socket
 	 */
-	protected void start() {
+	public void start() {
 		ServerSocket s;
 
 		System.out.println("Webserver starting up on port 1234");
