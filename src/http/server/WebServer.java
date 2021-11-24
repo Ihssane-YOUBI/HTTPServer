@@ -27,6 +27,7 @@ public class WebServer {
 	 * WebServer constructor.
 	 * Manages the treatment of HTTP request from different clients.
 	 * Used port is 1234.
+	 * Supported HTTP requests : GET, HEAD, PUT, POST, DELETE.
 	 */
 	protected void start() {
 		ServerSocket s;
@@ -105,11 +106,14 @@ public class WebServer {
 					request = "";
 					remote.close();
 				} else {
+					// Bad Request
 					// send the headers
 					out.println("HTTP/1.0 400 Bad Request");
 					out.println("Content-Type: text/html");
 					out.println("Server: Bot");
+					// this blank line signals the end of the headers
 					out.println("");
+					// Send the HTML page
 					out.println("<H1>The request wasn't recognized.</H1>");
 					out.flush();
 					request = "";
